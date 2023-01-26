@@ -18,11 +18,11 @@ import (
 // Injectors from wire.go:
 
 func InitializeAPI(cfg config.Config) (*http.ServerHTTP, error) {
-	gormDB, err := db.ConnectDatabase(cfg)
+	client, err := db.ConnectDatabase(cfg)
 	if err != nil {
 		return nil, err
 	}
-	userRepository := repository.NewUserRepository(gormDB)
+	userRepository := repository.NewUserMongoRepository(client)
 	userUseCase := usecase.NewUserUseCase(userRepository)
 	userHandler := handler.NewUserHandler(userUseCase)
 	serverHTTP := http.NewServerHTTP(userHandler)
