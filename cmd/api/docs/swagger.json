@@ -6,11 +6,6 @@
     "paths": {
         "/api/users": {
             "get": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
                 "description": "Get all users",
                 "produces": [
                     "application/json"
@@ -24,10 +19,49 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/handler.Response"
-                            }
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Save user",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Get all users",
+                "operationId": "Save",
+                "parameters": [
+                    {
+                        "description": "admin signup with username, phonenumber email ,password",
+                        "name": "RegisterAdmin",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/domain.Users"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
                         }
                     }
                 }
@@ -35,17 +69,30 @@
         }
     },
     "definitions": {
-        "handler.Response": {
+        "domain.Users": {
             "type": "object",
             "properties": {
-                "id": {
-                    "type": "integer"
+                "email": {
+                    "type": "string"
                 },
                 "name": {
                     "type": "string"
                 },
-                "surname": {
+                "password": {
                     "type": "string"
+                }
+            }
+        },
+        "response.Response": {
+            "type": "object",
+            "properties": {
+                "data": {},
+                "errors": {},
+                "message": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "boolean"
                 }
             }
         }

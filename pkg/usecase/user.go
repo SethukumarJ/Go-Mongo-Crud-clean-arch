@@ -23,7 +23,7 @@ func NewUserUseCase(repo interfaces.UserRepository) services.UserUseCase {
 	}
 }
 
-func (c *userUseCase) FindAll(ctx context.Context) ([]domain.Users, error) {
+func (c *userUseCase) FindAll(ctx context.Context) ([]domain.UserResponse, error) {
 	users, err := c.userRepo.FindAll(ctx)
 	return users, err
 }
