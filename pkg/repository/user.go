@@ -16,8 +16,20 @@ type userDatabaseMongo struct {
 }
 
 // Delete implements interfaces.UserRepository
-func (*userDatabaseMongo) Delete(ctx context.Context, user domain.Users) error {
-	panic("unimplemented")
+func (db *userDatabaseMongo) Delete(ctx context.Context, userId string) error {
+	collection := db.DB.Database("mongo_demo").Collection("users")
+
+	// string to primitive.ObjectID
+	pid, _ := primitive.ObjectIDFromHex(userId)
+
+	// We create filter. If it is unnecessary to sort data for you, you can use bson.M{}
+	filter := bson.M{"_id": pid}
+
+	// err := collection.FindOne(ctx, filter).Decode(&user)
+	res, err := collection.DeleteOne(ctx, filter)
+	fmt.Printf("response : %v",res)
+
+	return err
 }
 
 // FindByID implements interfaces.UserRepository
@@ -33,8 +45,7 @@ func (db *userDatabaseMongo) FindByID(ctx context.Context, id string) (domain.Us
 
 	err := collection.FindOne(ctx, filter).Decode(&user)
 
-
-	if  err != nil {
+	if err != nil {
 		return domain.Users{}, fmt.Errorf("error while finding user %v", err.Error())
 	}
 	return user, nil

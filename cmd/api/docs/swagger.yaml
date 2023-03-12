@@ -63,6 +63,29 @@ paths:
       tags:
       - users
   /users:
+    delete:
+      description: Delete one users
+      operationId: DeleteOne
+      parameters:
+      - description: 'User Id : '
+        in: query
+        name: userId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Delete one users
+      tags:
+      - users
     get:
       description: Get one users
       operationId: FindOne

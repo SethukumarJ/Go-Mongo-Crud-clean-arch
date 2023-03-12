@@ -13,8 +13,8 @@ type userUseCase struct {
 }
 
 // Delete implements interfaces.UserUseCase
-func (*userUseCase) Delete(ctx context.Context, user domain.Users) error {
-	panic("unimplemented")
+func (c *userUseCase) Delete(ctx context.Context, userId string) error {
+	return c.userRepo.Delete(ctx, userId)
 }
 
 func NewUserUseCase(repo interfaces.UserRepository) services.UserUseCase {

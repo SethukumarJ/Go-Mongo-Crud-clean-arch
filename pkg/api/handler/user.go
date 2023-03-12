@@ -129,24 +129,41 @@ func (cr *UserHandler) Save(c *gin.Context) {
 	utils.ResponseJSON(*c, response)
 }
 
+// DeleteOne godoc
+// @summary Delete one users
+// @description Delete one users
+// @tags users
+// @id DeleteOne
+// @produce json
+// @Param        userId   query      string  true  "User Id : "
+// @Router /users [delete]
+// @Success 200 {object} response.Response{}
+// @Failure 422 {object} response.Response{}
 func (cr *UserHandler) Delete(c *gin.Context) {
-	userId := c.Param("id")
+	userId := c.Query("userId")
 
 	ctx := c.Request.Context()
 	user, err := cr.userUseCase.FindByID(ctx, userId)
 
 	if err != nil {
-		c.AbortWithStatus(http.StatusNotFound)
-	}
-
-	if user == (domain.Users{}) {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "User is not booking yet",
-		})
+		response :=response.ErrorResponse("FAILL",err.Error(),nil)
+		utils.ResponseJSON(*c,response)
 		return
 	}
 
-	cr.userUseCase.Delete(ctx, user)
+	if user == (domain.Users{}) {
+		response :=response.ErrorResponse("FAILL","There is no users with your id check id",nil)
+		utils.ResponseJSON(*c,response)
+		return
+	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "User is deleted successfully"})
+	err =cr.userUseCase.Delete(ctx, userId)
+	if err!=nil {
+		response :=response.ErrorResponse("FAILL",err.Error(),nil)
+		utils.ResponseJSON(*c,response)
+		return
+	}
+
+	response :=response.SuccessResponse(true,"SUCCESS",nil)
+	utils.ResponseJSON(*c,response)
 }

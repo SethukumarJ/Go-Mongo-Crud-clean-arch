@@ -32,7 +32,7 @@ func NewServerHTTP(userHandler *handler.UserHandler) *ServerHTTP {
 	engine.GET("/api/users", userHandler.FindAll)
 	engine.GET("/users", userHandler.FindByID)
 	engine.POST("/api/users", userHandler.Save)
-	engine.DELETE("users/:id", userHandler.Delete)
+	engine.DELETE("users", userHandler.Delete)
 
 	return &ServerHTTP{engine: engine}
 }
