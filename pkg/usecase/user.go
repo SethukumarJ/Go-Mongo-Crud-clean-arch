@@ -28,7 +28,7 @@ func (c *userUseCase) FindAll(ctx context.Context) ([]domain.UserResponse, error
 	return users, err
 }
 
-func (c *userUseCase) FindByID(ctx context.Context, id uint) (domain.Users, error) {
+func (c *userUseCase) FindByID(ctx context.Context, id string) (domain.Users, error) {
 	user, err := c.userRepo.FindByID(ctx, id)
 	return user, err
 }

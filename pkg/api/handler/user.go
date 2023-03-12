@@ -1,16 +1,15 @@
 package handler
 
 import (
+	"fmt"
 	"net/http"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
-	"github.com/jinzhu/copier"
 
 	domain "github.com/SethukumarJ/go-gin-clean-arch/pkg/domain"
-	utils "github.com/SethukumarJ/go-gin-clean-arch/pkg/utils"
 	"github.com/SethukumarJ/go-gin-clean-arch/pkg/response"
 	services "github.com/SethukumarJ/go-gin-clean-arch/pkg/usecase/interface"
+	utils "github.com/SethukumarJ/go-gin-clean-arch/pkg/utils"
 )
 
 type UserHandler struct {
@@ -28,6 +27,21 @@ func NewUserHandler(usecase services.UserUseCase) *UserHandler {
 		userUseCase: usecase,
 	}
 }
+
+// @title Go + Gin Workey API
+// @version 1.0
+// @description This is a sample server Job Portal server. You can visit the GitHub repository at https://github.com/fazilnbr/Job_Portal_Project
+
+// @contact.name API Support
+// @contact.url https://fazilnbr.github.io/mypeosolal.web.portfolio/
+// @contact.email fazilkp2000@gmail.com
+
+// @license.name MIT
+// @license.url https://opensource.org/licenses/MIT
+
+// @host localhost:3000
+// @BasePath /
+// @query.collection.format multi
 
 // FindAll godoc
 // @summary Get all users
@@ -53,27 +67,31 @@ func (cr *UserHandler) FindAll(c *gin.Context) {
 	utils.ResponseJSON(*c, response)
 }
 
+// FindOne godoc
+// @summary Get one users
+// @description Get one users
+// @tags users
+// @id FindOne
+// @produce json
+// @Param        userId   query      string  true  "User Id : "
+// @Router /users [get]
+// @Success 200 {object} response.Response{}
+// @Failure 422 {object} response.Response{}
 func (cr *UserHandler) FindByID(c *gin.Context) {
-	paramsId := c.Param("id")
-	id, err := strconv.Atoi(paramsId)
+	userId := c.Query("userId")
+	fmt.Println(userId)
+
+	user, err := cr.userUseCase.FindByID(c.Request.Context(), userId)
+	fmt.Printf("\n\nuser  : %v\n\nerr  %v\n\n", user, err)
 
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "cannot parse id",
-		})
+		response := response.ErrorResponse("FAILL", err.Error(), nil)
+		utils.ResponseJSON(*c, response)
 		return
 	}
+	response := response.SuccessResponse(true, "SUCCESS", user)
+	utils.ResponseJSON(*c, response)
 
-	user, err := cr.userUseCase.FindByID(c.Request.Context(), uint(id))
-
-	if err != nil {
-		c.AbortWithStatus(http.StatusNotFound)
-	} else {
-		response := Response{}
-		copier.Copy(&response, &user)
-
-		c.JSON(http.StatusOK, response)
-	}
 }
 
 // FindAll godoc
@@ -104,7 +122,6 @@ func (cr *UserHandler) Save(c *gin.Context) {
 		return
 	}
 
-	
 	user.Password = ""
 	response := response.SuccessResponse(true, "SUCCESS", user)
 	c.Writer.Header().Add("Content-Type", "application/json")
@@ -113,18 +130,10 @@ func (cr *UserHandler) Save(c *gin.Context) {
 }
 
 func (cr *UserHandler) Delete(c *gin.Context) {
-	paramsId := c.Param("id")
-	id, err := strconv.Atoi(paramsId)
-
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Cannot parse id",
-		})
-		return
-	}
+	userId := c.Param("id")
 
 	ctx := c.Request.Context()
-	user, err := cr.userUseCase.FindByID(ctx, uint(id))
+	user, err := cr.userUseCase.FindByID(ctx, userId)
 
 	if err != nil {
 		c.AbortWithStatus(http.StatusNotFound)

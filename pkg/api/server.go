@@ -30,7 +30,7 @@ func NewServerHTTP(userHandler *handler.UserHandler) *ServerHTTP {
 	// api := engine.Group("/api", middleware.AuthorizationMiddleware)
 
 	engine.GET("/api/users", userHandler.FindAll)
-	engine.GET("/users/:id", userHandler.FindByID)
+	engine.GET("/users", userHandler.FindByID)
 	engine.POST("/api/users", userHandler.Save)
 	engine.DELETE("users/:id", userHandler.Delete)
 

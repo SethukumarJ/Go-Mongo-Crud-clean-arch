@@ -21,8 +21,23 @@ func (*userDatabaseMongo) Delete(ctx context.Context, user domain.Users) error {
 }
 
 // FindByID implements interfaces.UserRepository
-func (*userDatabaseMongo) FindByID(ctx context.Context, id uint) (domain.Users, error) {
-	panic("unimplemented")
+func (db *userDatabaseMongo) FindByID(ctx context.Context, id string) (domain.Users, error) {
+	collection := db.DB.Database("mongo_demo").Collection("users")
+	var user domain.Users
+
+	// string to primitive.ObjectID
+	pid, _ := primitive.ObjectIDFromHex(id)
+
+	// We create filter. If it is unnecessary to sort data for you, you can use bson.M{}
+	filter := bson.M{"_id": pid}
+
+	err := collection.FindOne(ctx, filter).Decode(&user)
+
+
+	if  err != nil {
+		return domain.Users{}, fmt.Errorf("error while finding user %v", err.Error())
+	}
+	return user, nil
 }
 
 // Save implements interfaces.UserRepository
@@ -60,21 +75,21 @@ func (db *userDatabaseMongo) FindAll(ctx context.Context) ([]domain.UserResponse
 	defer cursor.Close(ctx)
 
 	// Loop through the documents and decode them into user structs.
-// Loop through the documents and decode them into user structs.
-for cursor.Next(ctx) {
-    var user domain.UserResponse
-    err := cursor.Decode(&user)
-    if err != nil {
-        return nil, fmt.Errorf("error decoding user: %v", err)
-    }
+	// Loop through the documents and decode them into user structs.
+	for cursor.Next(ctx) {
+		var user domain.UserResponse
+		err := cursor.Decode(&user)
+		if err != nil {
+			return nil, fmt.Errorf("error decoding user: %v", err)
+		}
 
-    // Check if the ID field is present in the MongoDB document.
-    if user.ID != nil {
-       fmt.Println(user.ID,"/////////////")
-    }
+		// Check if the ID field is present in the MongoDB document.
+		if user.ID != nil {
+			fmt.Println(user.ID, "/////////////")
+		}
 
-    users = append(users, user)
-}
+		users = append(users, user)
+	}
 
 	// Check for any errors during the iteration.
 	if err := cursor.Err(); err != nil {
